@@ -1,132 +1,280 @@
 ---
-###############################################################################
-# Configuration of OpenStack projects and users user environment.
+openstack_projects:
+  - "{{ openstack_compute_project }}"
 
-# List of OpenStack domains. Format is as required by the stackhpc.os-projects
-# role.
-# openstack_domains:
+openstack_compute_project:
+  name: compute
+  description: OpenStack compute project
+  project_domain: default
+  user_domain: default
+  users: "{{ openstack_compute_users }}"
+  # keypairs:
+  #   - name: jackphodgkiss_ed25519
+  #     public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILQech30mi+U14dLiM8e9EbW3A3Z+tMWUjSbfVvgAp9v jack@prometheus.local
+  # quotas: "{{ openstack_unlimited_quotas }}"
 
-# List of OpenStack projects. Format is as required by the stackhpc.os-projects
-# role.
-# openstack_projects:
+openstack_compute_users:
+  - name: jackphodgkiss
+    description: Jack Hodgkiss
+    password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          33333463333664326163313166373935346233343132653961303535356666643033636131653731
+          3466636639383562663866313939323231613237383533310a623432376533396535376331346639
+          62376534643832303637376238663935333861656263363065343265633431303763646534373334
+          6633353362396431630a636337383437363939353964326338303265656231343461386530316665
+          31353433643032643664313765636631323138303531666263326336653732336262303063306331
+          3031633330363364333836616436616265313061326338636236
+    email: identity@jackhodgkiss.uk
+    roles: "{{ openstack_admin_roles }}"
 
-###############################################################################
-# Configuration of networks, subnets and routers.
+openstack_admin_roles:
+  - admin
 
-# List of networks in the openstack system. Format is as required by the
-# stackhpc.os-networks role.
-# openstack_networks:
+openstack_unlimited_quotas:
+  backup_gigabytes: -1
+  backups: -1
+  cores: -1
+  floatingip: -1
+  gigabytes: -1
+  injected_file_size: -1
+  injected_files: -1
+  instances: -1
+  key_pairs: -1
+  per_volume_gigabytes: -1
+  ram: -1
+  security_group: -1
+  security_group_rule: -1
+  snapshots: -1
+  volumes: -1
 
-# List of routers in the openstack project. Format is as required by the
-# stackhpc.os-networks role.
-# openstack_routers:
+openstack_flavors:
+  - "{{ openstack_flavor_m1_tiny }}"
+  - "{{ openstack_flavor_m1_small }}"
+  - "{{ openstack_flavor_m1_medium }}"
+  - "{{ openstack_flavor_m1_large }}"
 
-# List of security groups in the openstack project.
-# Format is as required by the stackhpc.os-networks role.
-# openstack_security_groups:
+openstack_flavor_m1_tiny:
+  name: "m1.tiny"
+  ram: 512
+  disk: 16
+  vcpus: 1
 
-# List of RBAC definitions in the openstack projct. Format is as required by the
-# stackhpc.os-networks role.
-# openstack_networks_rbac:
+openstack_flavor_m1_small:
+  name: "m1.small"
+  ram: 1024
+  disk: 32
+  vcpus: 2
 
-###############################################################################
-# Configuration of nova flavors.
+openstack_flavor_m1_medium:
+  name: "m1.medium"
+  ram: 2048
+  disk: 64
+  vcpus: 3
 
-# List of nova flavors in the openstack project. Format is as required by the
-# stackhpc.os-flavors role.
-# openstack_flavors:
+openstack_flavor_m1_large:
+  name: "m1.large"
+  ram: 4096
+  disk: 128
+  vcpus: 4
 
-###############################################################################
-# Configuration of nova host aggregates.
+openstack_images:
+  - "{{ openstack_image_cirros_0_6_2 }}"
+  - "{{ openstack_image_cirros_0_6_3 }}"
+  - "{{ openstack_image_ubuntu_2204 }}"
+  - "{{ openstack_image_ubuntu_2404 }}"
 
-# List of nova host aggregates. Format is as required by the
-# stackhpc.os_host_aggregates role.
-# openstack_host_aggregates:
+openstack_image_cirros_0_6_2:
+  name: "Cirros 6.2"
+  type: qcow2
+  image_url: "https://github.com/cirros-dev/cirros/releases/download/0.6.2/cirros-0.6.2-aarch64-disk.img"
+  is_public: True
+  properties:
+    os_type: "linux"
+    os_distro: "cirros"
+    os_version: "0.6.2"
+    hw_rng_model: "virtio"
+    hw_scsi_model: virtio-scsi
+    hw_disk_bus: scsi
 
-###############################################################################
-# Configuration of Glance software images.
+openstack_image_cirros_0_6_3:
+  name: "Cirros 6.3"
+  type: qcow2
+  image_url: "https://github.com/cirros-dev/cirros/releases/download/0.6.3/cirros-0.6.3-aarch64-disk.img"
+  is_public: True
+  properties:
+    os_type: "linux"
+    os_distro: "cirros"
+    os_version: "0.6.2"
+    hw_rng_model: "virtio"
+    hw_scsi_model: virtio-scsi
+    hw_disk_bus: scsi
 
-# List of Glance images. Format is as required by the stackhpc.os-images role.
-# openstack_images:
+openstack_image_ubuntu_2204:
+  name: "Ubuntu 22.04"
+  type: qcow2
+  image_url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-arm64.img"
+  is_public: True
+  properties:
+    os_type: "linux"
+    os_distro: "Ubuntu"
+    os_version: "22.04"
+    hw_rng_model: "virtio"
+    hw_scsi_model: "virtio-scsi"
+    hw_disk_bus: "scsi"
+    hw_qemu_guest_agent: "yes"
+    os_require_quiesce: "yes"
 
-# List of Diskimage Builder (DIB) elements paths to include in image builds.
-# openstack_image_elements:
+openstack_image_ubuntu_2404:
+  name: "Ubuntu 24.04"
+  type: qcow2
+  image_url: https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-arm64.img
+  is_public: true
+  properties:
+    os_type: "linux"
+    os_distro: "Ubuntu"
+    os_version: "24.04"
+    hw_rng_model: "virtio"
+    hw_scsi_model: "virtio-scsi"
+    hw_disk_bus: "scsi"
+    hw_qemu_guest_agent: "yes"
+    os_require_quiesce: "yes"
 
-# List of Diskimage Builder (DIB) elements Git repositories to use in image
-# builds.
-# openstack_image_git_elements:
+openstack_networks:
+  - "{{ openstack_network_external }}"
+  - "{{ openstack_network_admin_vlan }}"
+  - "{{ openstack_network_compute_vlan }}"
+  - "{{ openstack_network_external_v6 }}"
 
-###############################################################################
-# Configuration of Magnum container clusters.
+openstack_network_external_name: "external"
 
-# List of magnum cluster templates. Format is as required by the
-# stackhpc.os-container-clusters role.
-# openstack_container_clusters_templates:
+openstack_network_external:
+  name: "{{ openstack_network_external_name }}"
+  project: "admin"
+  provider_network_type: "vlan"
+  provider_physical_network: "physnet1"
+  provider_segmentation_id: 40
+  shared: true
+  external: true
+  subnets:
+    - "{{ openstack_subnet_external }}"
 
-###############################################################################
-# Configuration variables for generating new Magnum cluster template config.
+openstack_subnet_external:
+  name: "{{ openstack_network_external_name }}"
+  project: "admin"
+  cidr: "10.0.40.0/24"
+  gateway_ip: "10.0.40.254"
+  allocation_pool_start: "10.0.40.200"
+  allocation_pool_end: "10.0.40.249"
 
-# These variables must be defined before using the generating new cluster
-# templates - see repo README for more details.
+openstack_network_admin_vlan_name: "admin-vlan"
 
-# Must have at least 2 CPUs, 4GB RAM and 20GB disk
-# magnum_default_master_flavor_name:
-# magnum_default_worker_flavor_name:
+openstack_network_admin_vlan:
+  name: "{{ openstack_network_admin_vlan_name }}"
+  project: admin
+  provider_network_type: "vlan"
+  provider_physical_network: "physnet1"
+  shared: false
+  subnets:
+    - "{{ openstack_subnet_admin_vlan }}"
 
-# Network to create tenant cluster FIPs on
-# magnum_external_net_name:
+openstack_subnet_admin_vlan:
+  name: "{{ openstack_network_admin_vlan_name }}"
+  project: admin
+  cidr: "172.20.0.0/24"
+  gateway_ip: "172.20.0.254"
+  allocation_pool_start: "172.20.0.1"
+  allocation_pool_end: "172.20.0.253"
 
-# Provider for cluster loadbalancers (e.g. 'ovn')
-# magnum_loadbalancer_provider:
+openstack_network_external_v6_name: "external_v6"
 
-# Kubernetes CNI to use for cluster templates (defaults to 'calico')
-# Must be one of the options supported by capi-helm-charts, see
-# https://github.com/stackhpc/capi-helm-charts/tree/main/charts/cluster-addons#container-network-interface-cni-plugins
-# magnum_default_network_driver:
+openstack_network_external_v6:
+  name: "{{ openstack_network_external_v6_name }}"
+  project: "admin"
+  provider_network_type: "vlan"
+  provider_physical_network: "physnet1"
+  provider_segmentation_id: 80
+  shared: true
+  external: true
+  subnets:
+    - "{{ openstack_subnet_external_v4 }}"
+    - "{{ openstack_subnet_external_v6 }}"
+  mtu: 1480
 
-# Whether to create a master nodes loadbalancer for cluster templates (defaults to 'True')
-# magnum_master_lb_enabled:
+openstack_subnet_external_v4:
+  name: "{{ openstack_network_external_name }}_v4"
+  project: "admin"
+  cidr: "10.0.80.0/24"
+  gateway_ip: "10.0.80.254"
+  allocation_pool_start: "10.0.80.200"
+  allocation_pool_end: "10.0.80.249"
 
-# Whether to add a floating IP to the loadbalancer for cluster templates (defaults to 'True')
-# magnum_cluster_floating_ip_enabled:
+openstack_subnet_external_v6:
+  name: "{{ openstack_network_external_v6_name }}"
+  project: "admin"
+  cidr: "2001:470:68d0::/64"
+  gateway_ip: "2001:470:68d0::1"
+  allocation_pool_start: "2001:470:68d0::2"
+  allocation_pool_end: "2001:470:68d0:0:ffff:ffff:ffff:ffff"
+  dns_nameservers:
+    - 2001:4860:4860::8888
+    - 2001:4860:4860::8844
+  ipv6_address_mode: "slaac"
+  ipv6_ra_mode: "slaac"
+  ip_version: 6
 
-# List of nameservers to use for cluster templates
-# magnum_cluster_default_dns_nameservers:
+openstack_routers:
+  - "{{ openstack_router_admin }}"
+  - "{{ openstack_router_compute }}"
 
-# Whether generated cluster templates should be public by default (defaults to 'True')
-# magnum_cluster_templates_public:
+openstack_router_admin:
+  - name: admin
+    project: admin
+    interfaces:
+      - "{{ openstack_network_admin_vlan_name }}"
+    network: "{{ openstack_network_external_name }}"
 
-###############################################################################
-# Configuration variables for a CloudKitty ratings service deployment.
+openstack_network_compute_vlan_name: "compute-vlan"
 
-#     #    ###   #######  #####    IN ORDER TO SUCCESSFULLY DEPLOY CLOUDKITTY
-# #   #   #   #     #     #        'cloudkitty.conf' & 'metrics.yml' MUST BE
-#  #  #   #   #     #     ###      PROVIDED ALONGSIDE THE FOLLOWING CONFIG.
-#   # #   #   #     #     #        MORE INFO CAN BE FOUND IN THE README.md
-#     #    ###      #     #####    'stackhpc-kayobe-config' DOCS.
-# A list where each item is a dictionary mapping the associated fields,
-# with the 'mappings' field also being a list of dictionaries. Example
-# of the mappings and their fields can be found below, however for more
-# information please refer to the stackhpc.openstack.os_ratings role docs.
-#
-# openstack_ratings_hashmap_field_mappings:
-#   - service: SERVICE_NAME
-#     name: FIELD_NAME
-#     mappings:
-#       - value: MAPPING_VALUE
-#         cost: MAPPING_COST
-#         type: MAPPING_TYPE
-#         group: MAPPING_GROUP <---THIS IS OPTIONAL---
+openstack_network_compute_vlan:
+  name: "{{ openstack_network_compute_vlan_name }}"
+  project: compute
+  provider_network_type: "vlan"
+  provider_physical_network: "physnet1"
+  shared: false
+  subnets:
+    - "{{ openstack_subnet_compute_vlan }}"
 
-# Much like the field mappings above, the service mappings are a list of
-# dictionaries, however these are not associated with a field.
-#
-# openstack_ratings_hashmap_service_mappings:
-#   - service: SERVICE_NAME
-#     cost: MAPPING_COST
-#     type: MAPPING_TYPE
-#     group: MAPPING_GROUP <---THIS IS OPTIONAL---
+openstack_subnet_compute_vlan:
+  name: "{{ openstack_network_compute_vlan_name }}"
+  project: compute
+  cidr: "10.141.0.0/24"
+  gateway_ip: "10.141.0.254"
+  allocation_pool_start: "10.141.0.1"
+  allocation_pool_end: "10.141.0.253"
 
-###############################################################################
-# Dummy variable to allow Ansible to accept this file.
-workaround_ansible_issue_8743: true
+openstack_router_compute:
+  - name: compute
+    project: compute
+    interfaces:
+      - "{{ openstack_network_compute_vlan_name }}"
+    network: "{{ openstack_network_external_name }}"
+
+openstack_security_groups:
+  - name: default
+    project: admin
+    rules:
+      - protocol: icmp
+      - protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - protocol: ipv6-icmp
+        ethertype: IPv6
+  - name: default
+    project: compute
+    rules:
+      - protocol: icmp
+      - protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - protocol: ipv6-icmp
+        ethertype: IPv6
