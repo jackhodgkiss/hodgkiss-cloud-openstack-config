@@ -52,6 +52,8 @@ openstack_flavors:
   - "{{ openstack_flavor_m1_small }}"
   - "{{ openstack_flavor_m1_medium }}"
   - "{{ openstack_flavor_m1_large }}"
+  - "{{ openstack_flavor_m1_xlarge }}"
+  - "{{ openstack_flavor_m1_xxlarge }}"
 
 openstack_flavor_m1_tiny:
   name: "m1.tiny"
@@ -61,50 +63,48 @@ openstack_flavor_m1_tiny:
 
 openstack_flavor_m1_small:
   name: "m1.small"
-  ram: 1024
+  ram: 2048
   disk: 32
   vcpus: 2
 
 openstack_flavor_m1_medium:
   name: "m1.medium"
-  ram: 2048
+  ram: 4096
   disk: 64
-  vcpus: 3
+  vcpus: 4
 
 openstack_flavor_m1_large:
   name: "m1.large"
-  ram: 4096
-  disk: 128
+  ram: 8192
+  disk: 64
   vcpus: 4
 
+openstack_flavor_m1_xlarge:
+  name: "m1.xlarge"
+  ram: 16384
+  disk: 64
+  vcpus: 8
+
+openstack_flavor_m1_xxlarge:
+  name: "m1.xxlarge"
+  ram: 32768
+  disk: 64
+  vcpus: 8
+
 openstack_images:
-  - "{{ openstack_image_cirros_0_6_2 }}"
   - "{{ openstack_image_cirros_0_6_3 }}"
   - "{{ openstack_image_ubuntu_2204 }}"
   - "{{ openstack_image_ubuntu_2404 }}"
 
-openstack_image_cirros_0_6_2:
-  name: "Cirros 6.2"
-  type: qcow2
-  image_url: "https://github.com/cirros-dev/cirros/releases/download/0.6.2/cirros-0.6.2-aarch64-disk.img"
-  is_public: True
-  properties:
-    os_type: "linux"
-    os_distro: "cirros"
-    os_version: "0.6.2"
-    hw_rng_model: "virtio"
-    hw_scsi_model: virtio-scsi
-    hw_disk_bus: scsi
-
 openstack_image_cirros_0_6_3:
   name: "Cirros 6.3"
   type: qcow2
-  image_url: "https://github.com/cirros-dev/cirros/releases/download/0.6.3/cirros-0.6.3-aarch64-disk.img"
+  image_url: "https://github.com/cirros-dev/cirros/releases/download/0.6.3/cirros-0.6.3-x86_64-disk.img"
   is_public: True
   properties:
     os_type: "linux"
     os_distro: "cirros"
-    os_version: "0.6.2"
+    os_version: "0.6.3"
     hw_rng_model: "virtio"
     hw_scsi_model: virtio-scsi
     hw_disk_bus: scsi
@@ -112,11 +112,11 @@ openstack_image_cirros_0_6_3:
 openstack_image_ubuntu_2204:
   name: "Ubuntu 22.04"
   type: qcow2
-  image_url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-arm64.img"
+  image_url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
   is_public: True
   properties:
     os_type: "linux"
-    os_distro: "Ubuntu"
+    os_distro: "ubuntu"
     os_version: "22.04"
     hw_rng_model: "virtio"
     hw_scsi_model: "virtio-scsi"
@@ -127,11 +127,11 @@ openstack_image_ubuntu_2204:
 openstack_image_ubuntu_2404:
   name: "Ubuntu 24.04"
   type: qcow2
-  image_url: https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-arm64.img
+  image_url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
   is_public: true
   properties:
     os_type: "linux"
-    os_distro: "Ubuntu"
+    os_distro: "ubuntu"
     os_version: "24.04"
     hw_rng_model: "virtio"
     hw_scsi_model: "virtio-scsi"
@@ -143,7 +143,7 @@ openstack_networks:
   - "{{ openstack_network_external }}"
   - "{{ openstack_network_admin_vlan }}"
   - "{{ openstack_network_compute_vlan }}"
-  - "{{ openstack_network_external_v6 }}"
+#  - "{{ openstack_network_external_v6 }}"
 
 openstack_network_external_name: "external"
 
@@ -152,7 +152,7 @@ openstack_network_external:
   project: "admin"
   provider_network_type: "vlan"
   provider_physical_network: "physnet1"
-  provider_segmentation_id: 40
+  provider_segmentation_id: 140
   shared: true
   external: true
   subnets:
@@ -161,10 +161,10 @@ openstack_network_external:
 openstack_subnet_external:
   name: "{{ openstack_network_external_name }}"
   project: "admin"
-  cidr: "10.0.40.0/24"
-  gateway_ip: "10.0.40.254"
-  allocation_pool_start: "10.0.40.200"
-  allocation_pool_end: "10.0.40.249"
+  cidr: "10.100.40.0/24"
+  gateway_ip: "10.100.40.254"
+  allocation_pool_start: "10.100.40.200"
+  allocation_pool_end: "10.100.40.249"
 
 openstack_network_admin_vlan_name: "admin-vlan"
 
@@ -180,47 +180,47 @@ openstack_network_admin_vlan:
 openstack_subnet_admin_vlan:
   name: "{{ openstack_network_admin_vlan_name }}"
   project: admin
-  cidr: "172.20.0.0/24"
-  gateway_ip: "172.20.0.254"
-  allocation_pool_start: "172.20.0.1"
-  allocation_pool_end: "172.20.0.253"
+  cidr: "172.24.0.0/24"
+  gateway_ip: "172.24.0.254"
+  allocation_pool_start: "172.24.0.1"
+  allocation_pool_end: "172.24.0.253"
 
-openstack_network_external_v6_name: "external_v6"
-
-openstack_network_external_v6:
-  name: "{{ openstack_network_external_v6_name }}"
-  project: "admin"
-  provider_network_type: "vlan"
-  provider_physical_network: "physnet1"
-  provider_segmentation_id: 80
-  shared: true
-  external: true
-  subnets:
-    - "{{ openstack_subnet_external_v4 }}"
-    - "{{ openstack_subnet_external_v6 }}"
-  mtu: 1480
-
-openstack_subnet_external_v4:
-  name: "{{ openstack_network_external_name }}_v4"
-  project: "admin"
-  cidr: "10.0.80.0/24"
-  gateway_ip: "10.0.80.254"
-  allocation_pool_start: "10.0.80.200"
-  allocation_pool_end: "10.0.80.249"
-
-openstack_subnet_external_v6:
-  name: "{{ openstack_network_external_v6_name }}"
-  project: "admin"
-  cidr: "2001:470:68d0::/64"
-  gateway_ip: "2001:470:68d0::1"
-  allocation_pool_start: "2001:470:68d0::2"
-  allocation_pool_end: "2001:470:68d0:0:ffff:ffff:ffff:ffff"
-  dns_nameservers:
-    - 2001:4860:4860::8888
-    - 2001:4860:4860::8844
-  ipv6_address_mode: "slaac"
-  ipv6_ra_mode: "slaac"
-  ip_version: 6
+#openstack_network_external_v6_name: "external_v6"
+#
+#openstack_network_external_v6:
+#  name: "{{ openstack_network_external_v6_name }}"
+#  project: "admin"
+#  provider_network_type: "vlan"
+#  provider_physical_network: "physnet1"
+#  provider_segmentation_id: 80
+#  shared: true
+#  external: true
+#  subnets:
+#    - "{{ openstack_subnet_external_v4 }}"
+#    - "{{ openstack_subnet_external_v6 }}"
+#  mtu: 1480
+#
+#openstack_subnet_external_v4:
+#  name: "{{ openstack_network_external_name }}_v4"
+#  project: "admin"
+#  cidr: "10.0.80.0/24"
+#  gateway_ip: "10.0.80.254"
+#  allocation_pool_start: "10.0.80.200"
+#  allocation_pool_end: "10.0.80.249"
+#
+#openstack_subnet_external_v6:
+#  name: "{{ openstack_network_external_v6_name }}"
+#  project: "admin"
+#  cidr: "2001:470:68d0::/64"
+#  gateway_ip: "2001:470:68d0::1"
+#  allocation_pool_start: "2001:470:68d0::2"
+#  allocation_pool_end: "2001:470:68d0:0:ffff:ffff:ffff:ffff"
+#  dns_nameservers:
+#    - 2001:4860:4860::8888
+#    - 2001:4860:4860::8844
+#  ipv6_address_mode: "slaac"
+#  ipv6_ra_mode: "slaac"
+#  ip_version: 6
 
 openstack_routers:
   - "{{ openstack_router_admin }}"
